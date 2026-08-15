@@ -1,6 +1,7 @@
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+using static UnityEngine.Rendering.DebugUI;
 #endif
 
 namespace StarterAssets
@@ -13,6 +14,8 @@ namespace StarterAssets
 		public bool jump;
 		public bool sprint;
 		public bool grab;
+		public bool hit;
+		public float weaponScroll;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -49,7 +52,28 @@ namespace StarterAssets
 		{
 			GrabInput(value.isPressed);
 		}
+
+		public void OnHit(InputValue input)
+		{
+			HitInput(input.isPressed);
+		}
+
+		public void OnWeaponScroll(InputValue input)
+		{
+			WeaponScrollInput(input.Get<float>());
+		}
+
 #endif
+
+		public void WeaponScrollInput(float newWeaponScrollInput)
+		{
+			weaponScroll = newWeaponScrollInput;
+		}
+
+		public void HitInput(bool newHitState)
+		{
+			hit = newHitState;
+		}
 
 		public void GrabInput(bool newGrabState)
 		{

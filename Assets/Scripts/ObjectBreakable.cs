@@ -7,6 +7,7 @@ public class ObjectBreakable : MonoBehaviour, IGetHealthSystem
     public float CurrentSwingSpeed => currentSwingSpeed;
     [SerializeField] private float maxHealth = 100;
     [SerializeField] private float damageMultiplier = 3f;
+    [SerializeField] private float knockbackForce = 5f;
     [SerializeField] private float damageThresholdSpeed = 2f;
     [SerializeField] private float healthbarDisplayTime = 3f;
 
@@ -27,10 +28,22 @@ public class ObjectBreakable : MonoBehaviour, IGetHealthSystem
     {
         healthSystem = new HealthSystem(maxHealth);
         healthSystem.OnDead += OnObjectBreak;
-        healthSystem.OnDamaged += ShowHealthBar;
+        healthSystem.OnDamaged += OnDamageTaken;
     }
 
-    private void ShowHealthBar(object sender, System.EventArgs e)
+    private void OnDamageTaken(object sender, System.EventArgs e)
+    {
+        ShowHealthBar();
+    }
+
+    public void TakeWeaponDamage(float damageAmount, Vector3 hitDirection)
+    {
+        Vector3 knockback = (hitDirection + Vector3.up * 0.5f).normalized;
+        objectRigidBody.AddForce(knockback * knockbackForce, ForceMode.Impulse);
+        healthSystem.Damage(damageAmount);
+    }
+
+    private void ShowHealthBar()
     {
         if (healthbarCoroutine != null)
         {
@@ -120,6 +133,6 @@ public class ObjectBreakable : MonoBehaviour, IGetHealthSystem
     private void OnDestroy()
     {
         healthSystem.OnDead -= OnObjectBreak;
-        healthSystem.OnDamaged -= ShowHealthBar;
+        healthSystem.OnDamaged -= OnDamageTaken;
     }
 }
