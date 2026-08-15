@@ -12,6 +12,7 @@ namespace StarterAssets
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
+		public bool grab;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -43,8 +44,17 @@ namespace StarterAssets
 		{
 			SprintInput(value.isPressed);
 		}
+
+		public void OnGrab(InputValue value)
+		{
+			GrabInput(value.isPressed);
+		}
 #endif
 
+		public void GrabInput(bool newGrabState)
+		{
+			grab = newGrabState;
+		}
 
 		public void MoveInput(Vector2 newMoveDirection)
 		{

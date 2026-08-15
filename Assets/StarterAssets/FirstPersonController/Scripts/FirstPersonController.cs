@@ -51,6 +51,18 @@ namespace StarterAssets
 		[Tooltip("How far in degrees can you move the camera down")]
 		public float BottomClamp = -90.0f;
 
+		[Header("Object Grab")]
+		[Tooltip("How far player can grab objects")]
+		public float GrabDistance = 2f;
+
+        [Tooltip("Point where for grabbed object")]
+        public Transform objectGrabPoint;
+
+		[Tooltip("On which layer grab object will be")]
+		public LayerMask PickupLayerMask;
+
+		private ObjectGrabable _objectGrabable;
+
 		// cinemachine
 		private float _cinemachineTargetPitch;
 
@@ -111,13 +123,38 @@ namespace StarterAssets
 		}
 
 		private void Update()
-		{
-			JumpAndGravity();
-			GroundedCheck();
-			Move();
-		}
+        {
+            JumpAndGravity();
+            GroundedCheck();
+            Move();
+            Grab();
+        }
 
-		private void LateUpdate()
+        private void Grab()
+        {
+            if (_input.grab)
+            {
+                if (_objectGrabable == null)
+                {
+                    if (Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out RaycastHit raycastHit,
+                        GrabDistance, PickupLayerMask))
+                    {
+                        if (raycastHit.transform.TryGetComponent(out _objectGrabable))
+                        {
+                            _objectGrabable.Grab(objectGrabPoint);
+                        }
+                    }
+                }
+                else
+                {
+                    _objectGrabable.Drop(_mainCamera.transform.forward);
+                    _objectGrabable = null;
+                }
+                _input.grab = false;
+            }
+        }
+
+        private void LateUpdate()
 		{
 			CameraRotation();
 		}
